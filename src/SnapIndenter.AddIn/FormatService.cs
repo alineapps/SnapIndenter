@@ -26,6 +26,9 @@ namespace SnapIndenter.AddIn
 
         public event EventHandler SettingsChanged;
 
+        /// <summary>true の間、ショートカットキーで整形しない（設定画面を開いている間など）。</summary>
+        public bool SuppressHotkeys { get; private set; }
+
         // ---------------- コマンド ----------------
 
         /// <summary>複数行選択中なら選択範囲、そうでなければカーソル位置のプロシージャを整形する。</summary>
@@ -145,13 +148,22 @@ namespace SnapIndenter.AddIn
 
         public void ShowSettings() => Guard(() =>
         {
-            using (var form = new SettingsForm(Settings))
+            // 設定画面ではショートカットキーを押して登録するので、その間はキーボードフックでキーを横取りしない
+            SuppressHotkeys = true;
+            try
             {
-                if (form.ShowDialog(Owner()) != DialogResult.OK) return;
-                Settings = form.Result;
-                L10n.Apply(Settings.Language);
-                Settings.Save();
-                SettingsChanged?.Invoke(this, EventArgs.Empty);
+                using (var form = new SettingsForm(Settings))
+                {
+                    if (form.ShowDialog(Owner()) != DialogResult.OK) return;
+                    Settings = form.Result;
+                    L10n.Apply(Settings.Language);
+                    Settings.Save();
+                    SettingsChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            finally
+            {
+                SuppressHotkeys = false;
             }
         });
 

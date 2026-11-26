@@ -82,7 +82,7 @@ namespace SnapIndenter.AddIn
                     uint flags = unchecked((uint)lParam.ToInt64());
                     bool keyDown = (flags & 0x80000000) == 0;
                     bool repeat = (flags & 0x40000000) != 0;
-                    if (keyDown && !repeat)
+                    if (keyDown && !repeat && !_service.SuppressHotkeys)
                     {
                         var key = (Keys)wParam.ToInt32();
                         Action action = null;

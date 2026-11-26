@@ -49,8 +49,9 @@ End Sub";
         private readonly CheckBox _comments = Check(L10n.T("コメント行もインデントする", "Indent comment lines"));
         private readonly CheckBox _contAlign = Check(L10n.T("継続行（ _）の相対位置を保持する", "Keep relative position of continuation lines ( _)"));
         private readonly NumericUpDown _contLevels = new NumericUpDown { Minimum = 0, Maximum = 8, Width = 60 };
-        private readonly TextBox _hkCurrent = new TextBox { Width = 160 };
-        private readonly TextBox _hkModule = new TextBox { Width = 160 };
+        private readonly HotkeyBox _hkCurrent = new HotkeyBox { Width = 160 };
+        private readonly HotkeyBox _hkModule = new HotkeyBox { Width = 160 };
+        private readonly Label _hkMessage = new Label { AutoSize = true, Margin = new Padding(3, 2, 3, 3), MaximumSize = new Size(380, 0) };
         private readonly ComboBox _language = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 220 };
         private static readonly string[] LanguageCodes = { L10n.Auto, L10n.Japanese, L10n.English };
         private readonly TextBox _preview = new TextBox
@@ -110,9 +111,18 @@ End Sub";
             left.Controls.Add(_comments);
             left.Controls.Add(_contAlign);
             left.Controls.Add(Row(L10n.T("継続行の追加インデント（段）:", "Extra indent for continuation lines (levels):"), _contLevels));
-            left.Controls.Add(new Label { Text = L10n.T("ショートカットキー（例: Ctrl+Shift+F、空欄で無効）", "Shortcut keys (e.g. Ctrl+Shift+F; leave blank to disable)"), AutoSize = true, Margin = new Padding(3, 16, 3, 3) });
-            left.Controls.Add(Row(L10n.T("プロシージャ/選択範囲:", "Procedure / selection:"), _hkCurrent));
-            left.Controls.Add(Row(L10n.T("モジュール:", "Module:"), _hkModule));
+            left.Controls.Add(new Label { Text = L10n.T("ショートカットキー", "Shortcut keys"), AutoSize = true, Margin = new Padding(3, 16, 3, 3) });
+            left.Controls.Add(HotkeyRow(L10n.T("プロシージャ/選択範囲:", "Procedure / selection:"), _hkCurrent));
+            left.Controls.Add(HotkeyRow(L10n.T("モジュール:", "Module:"), _hkModule));
+            left.Controls.Add(_hkMessage);
+            ShowHotkeyHint();
+            foreach (var box in new[] { _hkCurrent, _hkModule })
+            {
+                box.Accepted += (s, e) => ShowHotkeyHint();
+                box.Rejected += (s, text) => ShowHotkeyError(L10n.T(
+                    $"「{text}」は登録できません。Ctrl か Alt を含む組み合わせか、F1～F24 を押してください。",
+                    $"\"{text}\" can't be used. Press a combination with Ctrl or Alt, or F1-F24."));
+            }
             var languageRow = Row("言語 / Language:", _language);
             languageRow.Margin = new Padding(0, 16, 0, 2);
             left.Controls.Add(languageRow);
@@ -201,6 +211,14 @@ End Sub";
                     return;
                 }
             }
+            if (_hkCurrent.Text.Length > 0 && string.Equals(_hkCurrent.Text, _hkModule.Text, StringComparison.OrdinalIgnoreCase))
+            {
+                ShowHotkeyError(L10n.T(
+                    $"「{_hkModule.Text}」は両方に登録されています。どちらかを変更してください。",
+                    $"\"{_hkModule.Text}\" is assigned to both commands. Change one of them."));
+                _hkModule.Focus();
+                return;
+            }
             Result = new Settings
             {
                 Options = ReadOptions(),
@@ -214,12 +232,36 @@ End Sub";
 
         private static CheckBox Check(string text) => new CheckBox { Text = text, AutoSize = true, Margin = new Padding(3, 4, 3, 4) };
 
-        private static Control Row(string label, Control control)
+        private static Control Row(string label, params Control[] controls)
         {
             var p = new FlowLayoutPanel { FlowDirection = FlowDirection.LeftToRight, AutoSize = true, WrapContents = false, Margin = new Padding(0, 2, 0, 2) };
             p.Controls.Add(new Label { Text = label, AutoSize = true, Margin = new Padding(3, 6, 3, 3) });
-            p.Controls.Add(control);
+            p.Controls.AddRange(controls);
             return p;
+        }
+
+        /// <summary>ラベルの幅をそろえた「ラベル + キー入力欄 + 解除ボタン」の行。</summary>
+        private Control HotkeyRow(string label, HotkeyBox box)
+        {
+            var clear = new Button { Text = L10n.T("解除", "Clear"), AutoSize = true, Margin = new Padding(3, 1, 3, 1) };
+            clear.Click += (s, e) => { box.Text = ""; ShowHotkeyHint(); box.Focus(); };
+            var row = (FlowLayoutPanel)Row(label, box, clear);
+            row.Controls[0].MinimumSize = new Size(140, 0);
+            return row;
+        }
+
+        private void ShowHotkeyHint()
+        {
+            _hkMessage.ForeColor = SystemColors.GrayText;
+            _hkMessage.Text = L10n.T(
+                "欄をクリックして、登録したいキーを押してください（例: Ctrl+Shift+F）。Backspace または「解除」で無効にできます。",
+                "Click a box and press the keys you want (e.g. Ctrl+Shift+F). Press Backspace or \"Clear\" to remove.");
+        }
+
+        private void ShowHotkeyError(string text)
+        {
+            _hkMessage.ForeColor = Color.Firebrick;
+            _hkMessage.Text = text;
         }
     }
 }
