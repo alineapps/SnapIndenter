@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>VbaFormatter</AssemblyName>
+    <RootNamespace>VbaFormatter.AddIn</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>VBA Formatter</Product>
+    <Description>VBE (Visual Basic Editor) 用の軽量コード整形アドイン</Description>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>embedded</DebugType>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 整形エンジンは同じ DLL に含める（Office プロセスからの依存 DLL 解決を避けるため） -->
+    <Compile Include="..\VbaFormatter.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Drawing" />
+    <!-- 相互運用型は埋め込むので、配布時に PIA は不要 -->
+    <Reference Include="Microsoft.Vbe.Interop">
+      <HintPath>lib\Microsoft.Vbe.Interop.dll</HintPath>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="office">
+      <HintPath>lib\office.dll</HintPath>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>
