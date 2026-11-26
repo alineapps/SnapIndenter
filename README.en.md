@@ -16,7 +16,7 @@
 ## Features
 
 - **A free alternative to Smart Indenter**: focused on the indentation features most people need.
-- **Fast and small**: a single ~60 KB DLL. It doesn't slow down Office startup the way Rubberduck can.
+- **Fast and small**: a single ~70 KB DLL. It doesn't slow down Office startup the way Rubberduck can.
 - **Works inside the VBE**: run it from the menu bar, the code window's context menu, or a keyboard shortcut.
 - **Easy install**: just run `install.bat`. No admin rights needed, and you don't have to enable "Trust access to the VBA project object model".
 - **32-bit and 64-bit Office**: works in Excel, Access, Word and any other host with a VBE.
