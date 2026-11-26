@@ -17,6 +17,7 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 Copy-Item $dllPath $stage
 Copy-Item installer\* $stage
 Copy-Item README.md $stage
+Copy-Item docs $stage -Recurse
 
 $zip = "dist\VbaFormatter-$version.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
