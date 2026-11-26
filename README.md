@@ -1,72 +1,81 @@
-# VBA Formatter
+# Kanna for VBA
 
-Excel / Access / Word などの Visual Basic Editor (VBE) から直接使える、軽量な VBA コード整形アドインです。
-詳しい仕様・インストール方法は [docs/仕様書.md](docs/仕様書.md) を参照してください。
-SmartIndenter 相当のインデント整形に機能を絞っているので、起動はほぼ一瞬です。
+[![Release](https://img.shields.io/github/v/release/alineapps/kanna-vba)](https://github.com/alineapps/kanna-vba/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## インストール
+**VBE（Visual Basic Editor）にかんなをかける。** Excel / Access の VBA コードを、ショートカットキー 1 つでインデント整形する軽量アドインです。
 
-1. Excel / Access などの Office アプリをすべて終了します。
-2. `install.bat` をダブルクリックします。
-   - ユーザー単位で登録するため、管理者権限は不要です。
-   - 32bit 版／64bit 版 Office のどちらにも対応しています。
-   - 「VBA プロジェクト オブジェクト モデルへのアクセスを信頼する」の設定は不要です。
-3. Office を起動して `Alt+F11` で VBE を開くと、メニューバーに **整形(J)** が追加されています。
+[English README](README.en.md)
 
-アンインストールするときは `uninstall.bat` を実行します。
+| 整形前 | 整形後（`Ctrl+Shift+F`） |
+|---|---|
+| ![整形前](docs/images/before.png) | ![整形後](docs/images/after.png) |
 
-> 動作要件: Windows 10 / 11（.NET Framework 4.8 は標準で入っています）、Office 2010 以降
+## 特長
+
+- **SmartIndenter の代替として使える無料のインデント整形**：SmartIndenter が有償化されたため、同程度の機能に絞って自作しました。
+- **軽い**：DLL 1 つ（約 60KB）。Rubberduck のように Office の起動を待たせません。
+- **VBE から直接操作**：メニュー、右クリックメニュー、ショートカットキーから実行できます。
+- **インストールが簡単**：`install.bat` を実行するだけ。管理者権限も、「VBA プロジェクト オブジェクト モデルへのアクセスを信頼する」の設定も不要です。
+- **32bit / 64bit 版 Office 対応**：Excel、Access、Word など VBE を持つアプリで使えます。
+- **行数を変えない**：インデントだけを直すので、ブレークポイントの位置もずれません。
+
+## ダウンロードとインストール
+
+1. [Releases](https://github.com/alineapps/kanna-vba/releases/latest) から `KannaForVBA-x.y.z.zip` をダウンロードします。
+2. Excel / Access など Office をすべて終了します。
+3. zip を右クリック →「プロパティ」→「全般」タブ下部の **「許可する」** にチェックを入れて「OK」を押します。
+4. zip を展開し、`install.bat` をダブルクリックします。
+5. Office を起動して `Alt+F11` で VBE を開くと、メニューバーに **整形(J)** が追加されています。
+
+> 手順 3 を省くと、実行時に「Windows によって PC が保護されました」などの警告が出ることがあります。その場合は「詳細情報」→「実行」で続行できます。
+
+アンインストールは `uninstall.bat` を実行します。旧名称「VBA Formatter」から移行する場合も、`install.bat` を実行するだけで旧版は自動で削除されます。
+
+**動作環境**：Windows 10 / 11、.NET Framework 4.8（Windows に標準搭載）、Office 2010 以降（Microsoft 365 を含む）
 
 ## 使い方
 
 | 操作 | メニュー | 既定のショートカット |
 |---|---|---|
 | カーソル位置のプロシージャを整形（複数行を選択しているときは選択範囲） | 整形 → プロシージャ/選択範囲を整形 | `Ctrl+Shift+F` |
-| 表示中のモジュール全体を整形 | 整形 → モジュールを整形 | （未割り当て） |
+| 表示中のモジュール全体を整形 | 整形 → モジュールを整形 | （設定で割り当て可） |
 | アクティブなプロジェクトの全モジュールを整形 | 整形 → プロジェクト全体を整形 | |
 | 直前の整形を元に戻す | 整形 → 直前の整形を元に戻す | |
 | 設定（プレビュー付き） | 整形 → 設定 | |
 
 コード ウィンドウの右クリックメニューからも実行できます。
 
-※ VBE の「元に戻す」(Ctrl+Z) ではアドインによる変更を戻せません。整形メニューの「直前の整形を元に戻す」を使ってください。
+※ VBE の `Ctrl+Z` ではアドインによる変更を戻せません。「直前の整形を元に戻す」を使ってください。
 
 ## 整形内容
 
-- ブロック構造に合わせたインデント
-  `Sub/Function/Property`、`If/ElseIf/Else`、`Select Case/Case`、`For/For Each/Next`（`Next i, j` も対応）、
-  `Do/Loop`、`While/Wend`、`With`、`Type`、`Enum`、`#If/#Else/#End If`
-- 1 行 If（`If x Then y`）はブロックとして扱わない
-- 行ラベル・行番号は 1 桁目に置く
-- 行継続（` _`）の 2 行目以降は、1 行目からの相対位置を保ったまま移動する
-- 空白だけの行と行末の空白を削除する
-- 文字列やコメントの中のキーワードは無視する
-- 行数は変わりません（ブレークポイントやブックマークの位置はずれません）
+- `Sub` / `Function` / `Property`、`If` / `ElseIf` / `Else`、`Select Case` / `Case`、`For` / `Next`、`Do` / `Loop`、`While` / `Wend`、`With`、`Type`、`Enum`、`#If` に合わせてインデントします。
+- 1 行 If（`If x Then y`）はブロックとして扱いません。
+- 行ラベル・行番号は 1 桁目に置きます。
+- 行継続（` _`）の 2 行目以降は、1 行目からの相対位置を保ったまま移動します。
+- 文字列やコメントの中のキーワードは無視します。
 
-空白の入れ方やキーワードの大文字・小文字は、VBE が自動で直すため触りません。
-
-## 設定
-
-設定ダイアログで変更できます。設定は `%APPDATA%\VbaFormatter\settings.ini` に保存されます。
-
-- インデント幅 / タブ使用
-- プロシージャ本体・Case・Type/Enum メンバー・`#If` の中をインデントするか
-- コメント行をインデントするか
-- 継続行の相対位置を保持するか、継続行に追加するインデントの段数
-- ショートカットキー（例: `Ctrl+Shift+F`、`Ctrl+Alt+I`、`F12`）
+インデント幅、タブの使用、`Case` をインデントするかどうか、ショートカットキーなどは設定画面で変更できます。詳しくは [仕様書](docs/仕様書.md) を参照してください。
 
 ## 開発
 
 ```
-src/VbaFormatter.Core    整形エンジン（Office に依存しない。netstandard2.0）
-src/VbaFormatter.AddIn   VBE 用 COM アドイン（net48。Core のソースも取り込んで 1 つの DLL にする）
-tests/VbaFormatter.Tests 整形エンジンの単体テスト（xUnit）
-installer/               インストール・アンインストール用スクリプト
+src/Kanna.Core     整形エンジン（Office に依存しない。netstandard2.0）
+src/Kanna.AddIn    VBE 用 COM アドイン（net48。Core のソースも取り込んで Kanna.dll にする）
+tests/Kanna.Tests  整形エンジンの単体テスト（xUnit）
+installer/         インストール・アンインストール用スクリプト
+docs/              仕様書
 ```
 
 ```powershell
-.\build.ps1      # テスト → Release ビルド → dist\VbaFormatter-x.y.z.zip を作成
+.\build.ps1      # テスト → Release ビルド → dist\KannaForVBA-x.y.z.zip を作成
 ```
 
-開発中の DLL をインストールするときは `installer\install.ps1 -Source src\VbaFormatter.AddIn\bin\Release\net48` を実行します。
-ログは `%LOCALAPPDATA%\VbaFormatter\VbaFormatter.log` に出力されます。
+ビルドには .NET SDK 10 以降と、Office の相互運用アセンブリ（Office をインストールすると GAC に入ります）が必要です。詳しくは [仕様書の 11 章](docs/仕様書.md#11-ビルドテスト配布開発者向け) を参照してください。
+
+不具合報告や要望は [Issues](https://github.com/alineapps/kanna-vba/issues) へお願いします。整形が崩れる場合は、該当するコードの例を添えていただけると助かります。
+
+## ライセンス
+
+[MIT License](LICENSE)

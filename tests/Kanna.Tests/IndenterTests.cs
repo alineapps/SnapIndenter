@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using VbaFormatter.Core;
+using Kanna.Core;
 using Xunit;
 
-namespace VbaFormatter.Tests
+namespace Kanna.Tests
 {
     public class IndenterTests
     {

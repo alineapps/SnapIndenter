@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <AssemblyName>VbaFormatter</AssemblyName>
-    <RootNamespace>VbaFormatter.AddIn</RootNamespace>
+    <AssemblyName>Kanna</AssemblyName>
+    <RootNamespace>Kanna.AddIn</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.0</Version>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.0</FileVersion>
-    <Product>VBA Formatter</Product>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <Product>Kanna for VBA</Product>
     <Description>VBE (Visual Basic Editor) 用の軽量コード整形アドイン</Description>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <!-- 整形エンジンは同じ DLL に含める（Office プロセスからの依存 DLL 解決を避けるため） -->
-    <Compile Include="..\VbaFormatter.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
+    <Compile Include="..\Kanna.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>

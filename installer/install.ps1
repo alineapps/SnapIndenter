@@ -1,26 +1,47 @@
-﻿# VBA Formatter インストーラー（ユーザー単位・管理者権限不要）
+﻿# Kanna for VBA インストーラー（ユーザー単位・管理者権限不要）
 param(
     [string]$Source = $PSScriptRoot
 )
 $ErrorActionPreference = 'Stop'
 
-$clsid    = '{607D618A-9D3E-4359-8B98-D12F7CDD63BA}'
-$progId   = 'VbaFormatter.Connect'
-$class    = 'VbaFormatter.AddIn.Connect'
-$destDir  = Join-Path $env:LOCALAPPDATA 'VbaFormatter'
-$dll      = Join-Path $destDir 'VbaFormatter.dll'
-$srcDll   = Join-Path $Source 'VbaFormatter.dll'
+$clsid    = '{DC6A7B4F-8888-4FA0-BFF5-23674D28B50F}'
+$progId   = 'Kanna.Connect'
+$class    = 'Kanna.AddIn.Connect'
+$destDir  = Join-Path $env:LOCALAPPDATA 'Kanna'
+$dll      = Join-Path $destDir 'Kanna.dll'
+$srcDll   = Join-Path $Source 'Kanna.dll'
 
-Write-Host 'VBA Formatter をインストールします...'
+Write-Host 'Kanna for VBA をインストールします...'
 
 if (-not (Test-Path $srcDll)) {
-    throw "VbaFormatter.dll が見つかりません: $srcDll"
+    throw "Kanna.dll が見つかりません: $srcDll"
 }
 
 $running = Get-Process EXCEL, MSACCESS, WINWORD, POWERPNT, OUTLOOK -ErrorAction SilentlyContinue
 if ($running) {
     Write-Warning ('Office が起動中です（' + (($running | Select-Object -ExpandProperty ProcessName -Unique) -join ', ') + '）。インストール後に再起動してください。')
 }
+
+# 0. 旧名称（VBA Formatter 1.0）が入っていれば削除する。設定ファイルは Kanna が引き継ぐので残す
+$legacyClsid  = '{607D618A-9D3E-4359-8B98-D12F7CDD63BA}'
+$legacyProgId = 'VbaFormatter.Connect'
+$legacyKeys = @(
+    "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$legacyProgId",
+    "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins64\$legacyProgId",
+    "HKCU:\Software\Classes\$legacyProgId",
+    "HKCU:\Software\Classes\CLSID\$legacyClsid",
+    "HKCU:\Software\Classes\WOW6432Node\CLSID\$legacyClsid"
+)
+$foundLegacy = $false
+foreach ($k in $legacyKeys) {
+    if (Test-Path $k) { Remove-Item $k -Recurse -Force; $foundLegacy = $true }
+}
+$legacyDir = Join-Path $env:LOCALAPPDATA 'VbaFormatter'
+if (Test-Path $legacyDir) {
+    $foundLegacy = $true
+    try { Remove-Item $legacyDir -Recurse -Force } catch { Write-Warning "旧版のフォルダーを削除できませんでした: $legacyDir" }
+}
+if ($foundLegacy) { Write-Host '旧名称（VBA Formatter）の登録を削除しました。' }
 
 # 1. DLL をコピー
 New-Item -ItemType Directory -Force -Path $destDir | Out-Null
@@ -64,14 +85,14 @@ foreach ($root in 'HKCU:\Software\Classes\CLSID', 'HKCU:\Software\Classes\WOW643
     Set-InprocValues "$ips\$version"
 }
 
-Set-Key "HKCU:\Software\Classes\$progId" 'VBA Formatter'
+Set-Key "HKCU:\Software\Classes\$progId" 'Kanna for VBA'
 Set-Key "HKCU:\Software\Classes\$progId\CLSID" $clsid
 
 # 3. VBE アドインとして登録（Addins = 32bit Office、Addins64 = 64bit Office）
 foreach ($kind in 'Addins', 'Addins64') {
     $key = "HKCU:\Software\Microsoft\VBA\VBE\6.0\$kind\$progId"
     Set-Key $key $null
-    Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'VBA Formatter'
+    Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'Kanna for VBA'
     Set-ItemProperty -Path $key -Name 'Description'     -Value 'VBA コードのインデント整形'
     Set-ItemProperty -Path $key -Name 'LoadBehavior'    -Value 3 -Type DWord
     Set-ItemProperty -Path $key -Name 'CommandLineSafe' -Value 0 -Type DWord

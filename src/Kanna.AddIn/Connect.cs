@@ -2,7 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using Microsoft.Vbe.Interop;
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
     /// <summary>VBE から読み込まれる COM アドインのエントリポイント。</summary>
     [ComVisible(true)]
@@ -11,8 +11,8 @@ namespace VbaFormatter.AddIn
     [ClassInterface(ClassInterfaceType.None)]
     public sealed class Connect : IDTExtensibility2
     {
-        public const string ClassId = "607D618A-9D3E-4359-8B98-D12F7CDD63BA";
-        public const string ProgIdName = "VbaFormatter.Connect";
+        public const string ClassId = "DC6A7B4F-8888-4FA0-BFF5-23674D28B50F";
+        public const string ProgIdName = "Kanna.Connect";
 
         // VBE が COM 参照を保持し続ける保証がないため、自分で強参照を持って GC を防ぐ
         private static Connect _instance;

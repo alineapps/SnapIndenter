@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using Microsoft.Office.Core;
 using Microsoft.Vbe.Interop;
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
     /// <summary>VBE のメニューバーとコードウィンドウの右クリックメニューに項目を追加する。</summary>
     internal sealed class MenuManager : IDisposable
     {
-        private const string Tag = "VbaFormatter.Menu";
+        private const string Tag = "Kanna.Menu";
 
         private readonly VBE _vbe;
         private readonly FormatService _service;

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using VbaFormatter.Core;
+using Kanna.Core;
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
-    /// <summary>%APPDATA%\VbaFormatter\settings.ini に保存される設定。</summary>
+    /// <summary>%APPDATA%\Kanna\settings.ini に保存される設定。</summary>
     internal sealed class Settings
     {
         public FormatterOptions Options { get; set; } = new FormatterOptions();
@@ -15,6 +15,10 @@ namespace VbaFormatter.AddIn
         public string FormatModuleHotkey { get; set; } = "";
 
         public static string FilePath { get; } = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kanna", "settings.ini");
+
+        /// <summary>旧名称（VBA Formatter 1.0）の設定ファイル。新しい設定がなければこちらを引き継ぐ。</summary>
+        private static string LegacyFilePath { get; } = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VbaFormatter", "settings.ini");
 
         public static Settings Load()
@@ -22,9 +26,10 @@ namespace VbaFormatter.AddIn
             var s = new Settings();
             try
             {
-                if (!File.Exists(FilePath)) return s;
+                string path = File.Exists(FilePath) ? FilePath : File.Exists(LegacyFilePath) ? LegacyFilePath : null;
+                if (path == null) return s;
                 var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                foreach (var raw in File.ReadAllLines(FilePath, Encoding.UTF8))
+                foreach (var raw in File.ReadAllLines(path, Encoding.UTF8))
                 {
                     string line = raw.Trim();
                     if (line.Length == 0 || line.StartsWith(";") || line.StartsWith("#") || line.StartsWith("[")) continue;

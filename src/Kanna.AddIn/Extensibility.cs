@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 [assembly: ComVisible(false)]
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
     // Extensibility.dll (AddInDesignerObjects) の定義を自前で宣言し、追加の参照 DLL を不要にする。
 

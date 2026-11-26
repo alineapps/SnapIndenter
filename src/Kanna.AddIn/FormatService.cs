@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Vbe.Interop;
-using VbaFormatter.Core;
+using Kanna.Core;
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
     /// <summary>VBE 上の整形コマンドの実装。</summary>
     internal sealed class FormatService
     {
-        private const string Title = "VBA Formatter";
+        private const string Title = "Kanna for VBA";
 
         private readonly VBE _vbe;
         private UndoBatch _lastBatch;

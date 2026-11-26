@@ -1,4 +1,4 @@
-namespace VbaFormatter.Core
+namespace Kanna.Core
 {
     /// <summary>整形オプション。</summary>
     public sealed class FormatterOptions

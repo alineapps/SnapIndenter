@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 
-namespace VbaFormatter.AddIn
+namespace Kanna.AddIn
 {
     internal static class Log
     {
         private static readonly string FilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "VbaFormatter", "VbaFormatter.log");
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kanna", "Kanna.log");
 
         public static void Info(string message) => Write("INFO ", message);
 

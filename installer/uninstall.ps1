@@ -1,11 +1,11 @@
-﻿# VBA Formatter アンインストーラー
+﻿# Kanna for VBA アンインストーラー
 $ErrorActionPreference = 'Stop'
 
-$clsid   = '{607D618A-9D3E-4359-8B98-D12F7CDD63BA}'
-$progId  = 'VbaFormatter.Connect'
-$destDir = Join-Path $env:LOCALAPPDATA 'VbaFormatter'
+$clsid   = '{DC6A7B4F-8888-4FA0-BFF5-23674D28B50F}'
+$progId  = 'Kanna.Connect'
+$destDir = Join-Path $env:LOCALAPPDATA 'Kanna'
 
-Write-Host 'VBA Formatter をアンインストールします...'
+Write-Host 'Kanna for VBA をアンインストールします...'
 
 $keys = @(
     "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$progId",
@@ -27,4 +27,4 @@ if (Test-Path $destDir) {
 }
 
 Write-Host 'アンインストールが完了しました。' -ForegroundColor Green
-Write-Host "設定ファイルは残しています: $env:APPDATA\VbaFormatter\settings.ini"
+Write-Host "設定ファイルは残しています: $env:APPDATA\Kanna\settings.ini"
