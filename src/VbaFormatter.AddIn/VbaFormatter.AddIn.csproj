@@ -23,17 +23,40 @@
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Drawing" />
-    <!-- 相互運用型は埋め込むので、配布時に PIA は不要 -->
-    <Reference Include="Microsoft.Vbe.Interop">
-      <HintPath>lib\Microsoft.Vbe.Interop.dll</HintPath>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="office">
-      <HintPath>lib\office.dll</HintPath>
+  </ItemGroup>
+
+  <!--
+    Office の相互運用アセンブリ（Microsoft.Vbe.Interop / office）は、Microsoft の配布物なのでリポジトリに含めない。
+    ビルド時は Office をインストールした環境の GAC から参照する。
+    GAC にない場合は、DLL を置いたフォルダーを指定してビルドする:
+      dotnet build -p:OfficeInteropDir=C:\path\to\dlls
+    相互運用型は DLL に埋め込む（EmbedInteropTypes）ので、実行時には不要。
+  -->
+  <PropertyGroup>
+    <_GacMsil>$(WINDIR)\assembly\GAC_MSIL</_GacMsil>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(OfficeInteropDir)' != ''">
+    <_VbeInterop Include="$(OfficeInteropDir)\Microsoft.Vbe.Interop.dll" Condition="Exists('$(OfficeInteropDir)\Microsoft.Vbe.Interop.dll')" />
+    <_OfficeInterop Include="$(OfficeInteropDir)\office.dll" Condition="Exists('$(OfficeInteropDir)\office.dll')" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(OfficeInteropDir)' == ''">
+    <_VbeInterop Include="$(_GacMsil)\Microsoft.Vbe.Interop\*\Microsoft.Vbe.Interop.dll" />
+    <_OfficeInterop Include="$(_GacMsil)\office\*\office.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="@(_VbeInterop);@(_OfficeInterop)">
       <EmbedInteropTypes>true</EmbedInteropTypes>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
+  <Target Name="CheckOfficeInterop" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'@(_VbeInterop)' == '' Or '@(_OfficeInterop)' == ''"
+           Text="Office の相互運用アセンブリ（Microsoft.Vbe.Interop.dll / office.dll）が見つかりません。Office をインストールするか、-p:OfficeInteropDir=&lt;DLL のあるフォルダー&gt; を指定してください。" />
+    <Warning Condition="@(_VbeInterop->Count()) &gt; 1 Or @(_OfficeInterop->Count()) &gt; 1"
+             Text="GAC に複数バージョンの相互運用アセンブリがあります。ビルドに失敗する場合は -p:OfficeInteropDir で 1 つを指定してください。" />
+  </Target>
 
 </Project>
