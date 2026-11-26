@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Vbe.Interop;
 
-namespace Kanna.AddIn
+namespace SnapIndenter.AddIn
 {
     /// <summary>
     /// VBE がアクティブなときだけショートカットキーを拾うスレッドローカルのキーボードフック。

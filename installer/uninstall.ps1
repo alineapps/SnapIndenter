@@ -1,11 +1,11 @@
-﻿# Kanna for VBA アンインストーラー
+﻿# SnapIndenter アンインストーラー
 $ErrorActionPreference = 'Stop'
 
-$clsid   = '{DC6A7B4F-8888-4FA0-BFF5-23674D28B50F}'
-$progId  = 'Kanna.Connect'
-$destDir = Join-Path $env:LOCALAPPDATA 'Kanna'
+$clsid   = '{0E25551F-0D2E-42D6-A7AD-1F172CD3E5A7}'
+$progId  = 'SnapIndenter.Connect'
+$destDir = Join-Path $env:LOCALAPPDATA 'SnapIndenter'
 
-Write-Host 'Kanna for VBA をアンインストールします...'
+Write-Host 'SnapIndenter をアンインストールします...'
 
 $keys = @(
     "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$progId",
@@ -27,4 +27,4 @@ if (Test-Path $destDir) {
 }
 
 Write-Host 'アンインストールが完了しました。' -ForegroundColor Green
-Write-Host "設定ファイルは残しています: $env:APPDATA\Kanna\settings.ini"
+Write-Host "設定ファイルは残しています: $env:APPDATA\SnapIndenter\settings.ini"

@@ -1,9 +1,9 @@
 using System;
 using System.Linq;
-using Kanna.Core;
+using SnapIndenter.Core;
 using Xunit;
 
-namespace Kanna.Tests
+namespace SnapIndenter.Tests
 {
     public class IndenterTests
     {

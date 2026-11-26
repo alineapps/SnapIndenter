@@ -1,20 +1,20 @@
-﻿# Kanna for VBA インストーラー（ユーザー単位・管理者権限不要）
+﻿# SnapIndenter インストーラー（ユーザー単位・管理者権限不要）
 param(
     [string]$Source = $PSScriptRoot
 )
 $ErrorActionPreference = 'Stop'
 
-$clsid    = '{DC6A7B4F-8888-4FA0-BFF5-23674D28B50F}'
-$progId   = 'Kanna.Connect'
-$class    = 'Kanna.AddIn.Connect'
-$destDir  = Join-Path $env:LOCALAPPDATA 'Kanna'
-$dll      = Join-Path $destDir 'Kanna.dll'
-$srcDll   = Join-Path $Source 'Kanna.dll'
+$clsid    = '{0E25551F-0D2E-42D6-A7AD-1F172CD3E5A7}'
+$progId   = 'SnapIndenter.Connect'
+$class    = 'SnapIndenter.AddIn.Connect'
+$destDir  = Join-Path $env:LOCALAPPDATA 'SnapIndenter'
+$dll      = Join-Path $destDir 'SnapIndenter.dll'
+$srcDll   = Join-Path $Source 'SnapIndenter.dll'
 
-Write-Host 'Kanna for VBA をインストールします...'
+Write-Host 'SnapIndenter をインストールします...'
 
 if (-not (Test-Path $srcDll)) {
-    throw "Kanna.dll が見つかりません: $srcDll"
+    throw "SnapIndenter.dll が見つかりません: $srcDll"
 }
 
 $running = Get-Process EXCEL, MSACCESS, WINWORD, POWERPNT, OUTLOOK -ErrorAction SilentlyContinue
@@ -22,26 +22,30 @@ if ($running) {
     Write-Warning ('Office が起動中です（' + (($running | Select-Object -ExpandProperty ProcessName -Unique) -join ', ') + '）。インストール後に再起動してください。')
 }
 
-# 0. 旧名称（VBA Formatter 1.0）が入っていれば削除する。設定ファイルは Kanna が引き継ぐので残す
-$legacyClsid  = '{607D618A-9D3E-4359-8B98-D12F7CDD63BA}'
-$legacyProgId = 'VbaFormatter.Connect'
-$legacyKeys = @(
-    "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$legacyProgId",
-    "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins64\$legacyProgId",
-    "HKCU:\Software\Classes\$legacyProgId",
-    "HKCU:\Software\Classes\CLSID\$legacyClsid",
-    "HKCU:\Software\Classes\WOW6432Node\CLSID\$legacyClsid"
+# 0. 旧名称（VBA Formatter 1.0 / Kanna for VBA 1.1）が入っていれば削除する。設定ファイルは SnapIndenter が引き継ぐので残す
+$legacies = @(
+    @{ Name = 'VBA Formatter'; ProgId = 'VbaFormatter.Connect'; Clsid = '{607D618A-9D3E-4359-8B98-D12F7CDD63BA}'; Dir = 'VbaFormatter' },
+    @{ Name = 'Kanna for VBA'; ProgId = 'Kanna.Connect';        Clsid = '{DC6A7B4F-8888-4FA0-BFF5-23674D28B50F}'; Dir = 'Kanna' }
 )
-$foundLegacy = $false
-foreach ($k in $legacyKeys) {
-    if (Test-Path $k) { Remove-Item $k -Recurse -Force; $foundLegacy = $true }
+foreach ($l in $legacies) {
+    $found = $false
+    $legacyKeys = @(
+        "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$($l.ProgId)",
+        "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins64\$($l.ProgId)",
+        "HKCU:\Software\Classes\$($l.ProgId)",
+        "HKCU:\Software\Classes\CLSID\$($l.Clsid)",
+        "HKCU:\Software\Classes\WOW6432Node\CLSID\$($l.Clsid)"
+    )
+    foreach ($k in $legacyKeys) {
+        if (Test-Path $k) { Remove-Item $k -Recurse -Force; $found = $true }
+    }
+    $legacyDir = Join-Path $env:LOCALAPPDATA $l.Dir
+    if (Test-Path $legacyDir) {
+        $found = $true
+        try { Remove-Item $legacyDir -Recurse -Force } catch { Write-Warning "旧版のフォルダーを削除できませんでした: $legacyDir" }
+    }
+    if ($found) { Write-Host "旧名称（$($l.Name)）の登録を削除しました。" }
 }
-$legacyDir = Join-Path $env:LOCALAPPDATA 'VbaFormatter'
-if (Test-Path $legacyDir) {
-    $foundLegacy = $true
-    try { Remove-Item $legacyDir -Recurse -Force } catch { Write-Warning "旧版のフォルダーを削除できませんでした: $legacyDir" }
-}
-if ($foundLegacy) { Write-Host '旧名称（VBA Formatter）の登録を削除しました。' }
 
 # 1. DLL をコピー
 New-Item -ItemType Directory -Force -Path $destDir | Out-Null
@@ -85,14 +89,14 @@ foreach ($root in 'HKCU:\Software\Classes\CLSID', 'HKCU:\Software\Classes\WOW643
     Set-InprocValues "$ips\$version"
 }
 
-Set-Key "HKCU:\Software\Classes\$progId" 'Kanna for VBA'
+Set-Key "HKCU:\Software\Classes\$progId" 'SnapIndenter'
 Set-Key "HKCU:\Software\Classes\$progId\CLSID" $clsid
 
 # 3. VBE アドインとして登録（Addins = 32bit Office、Addins64 = 64bit Office）
 foreach ($kind in 'Addins', 'Addins64') {
     $key = "HKCU:\Software\Microsoft\VBA\VBE\6.0\$kind\$progId"
     Set-Key $key $null
-    Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'Kanna for VBA'
+    Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'SnapIndenter'
     Set-ItemProperty -Path $key -Name 'Description'     -Value 'VBA コードのインデント整形'
     Set-ItemProperty -Path $key -Name 'LoadBehavior'    -Value 3 -Type DWord
     Set-ItemProperty -Path $key -Name 'CommandLineSafe' -Value 0 -Type DWord

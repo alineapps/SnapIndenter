@@ -1,4 +1,4 @@
-namespace Kanna.Core
+namespace SnapIndenter.Core
 {
     /// <summary>整形オプション。</summary>
     public sealed class FormatterOptions

@@ -1,12 +1,12 @@
 using System;
 using System.IO;
 
-namespace Kanna.AddIn
+namespace SnapIndenter.AddIn
 {
     internal static class Log
     {
         private static readonly string FilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Kanna", "Kanna.log");
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SnapIndenter", "SnapIndenter.log");
 
         public static void Info(string message) => Write("INFO ", message);
 

@@ -1,9 +1,9 @@
-# Kanna for VBA
+# SnapIndenter
 
-[![Release](https://img.shields.io/github/v/release/alineapps/kanna-vba)](https://github.com/alineapps/kanna-vba/releases/latest)
+[![Release](https://img.shields.io/github/v/release/alineapps/SnapIndenter)](https://github.com/alineapps/SnapIndenter/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**VBE（Visual Basic Editor）にかんなをかける。** Excel / Access の VBA コードを、ショートカットキー 1 つでインデント整形する軽量アドインです。
+**一瞬で起動して、一瞬で整う。** Excel / Access の VBA コードを、VBE（Visual Basic Editor）からショートカットキー 1 つでインデント整形する軽量アドインです。
 
 [English README](README.en.md)
 
@@ -22,7 +22,7 @@
 
 ## ダウンロードとインストール
 
-1. [Releases](https://github.com/alineapps/kanna-vba/releases/latest) から `KannaForVBA-x.y.z.zip` をダウンロードします。
+1. [Releases](https://github.com/alineapps/SnapIndenter/releases/latest) から `SnapIndenter-x.y.z.zip` をダウンロードします。
 2. Excel / Access など Office をすべて終了します。
 3. zip を右クリック →「プロパティ」→「全般」タブ下部の **「許可する」** にチェックを入れて「OK」を押します。
 4. zip を展開し、`install.bat` をダブルクリックします。
@@ -30,7 +30,7 @@
 
 > 手順 3 を省くと、実行時に「Windows によって PC が保護されました」などの警告が出ることがあります。その場合は「詳細情報」→「実行」で続行できます。
 
-アンインストールは `uninstall.bat` を実行します。旧名称「VBA Formatter」から移行する場合も、`install.bat` を実行するだけで旧版は自動で削除されます。
+アンインストールは `uninstall.bat` を実行します。旧名称「Kanna for VBA」「VBA Formatter」から移行する場合も、`install.bat` を実行するだけで旧版は自動で削除されます。
 
 **動作環境**：Windows 10 / 11、.NET Framework 4.8（Windows に標準搭載）、Office 2010 以降（Microsoft 365 を含む）
 
@@ -61,20 +61,20 @@
 ## 開発
 
 ```
-src/Kanna.Core     整形エンジン（Office に依存しない。netstandard2.0）
-src/Kanna.AddIn    VBE 用 COM アドイン（net48。Core のソースも取り込んで Kanna.dll にする）
-tests/Kanna.Tests  整形エンジンの単体テスト（xUnit）
+src/SnapIndenter.Core     整形エンジン（Office に依存しない。netstandard2.0）
+src/SnapIndenter.AddIn    VBE 用 COM アドイン（net48。Core のソースも取り込んで SnapIndenter.dll にする）
+tests/SnapIndenter.Tests  整形エンジンの単体テスト（xUnit）
 installer/         インストール・アンインストール用スクリプト
 docs/              仕様書
 ```
 
 ```powershell
-.\build.ps1      # テスト → Release ビルド → dist\KannaForVBA-x.y.z.zip を作成
+.\build.ps1      # テスト → Release ビルド → dist\SnapIndenter-x.y.z.zip を作成
 ```
 
 ビルドには .NET SDK 10 以降と、Office の相互運用アセンブリ（Office をインストールすると GAC に入ります）が必要です。詳しくは [仕様書の 11 章](docs/仕様書.md#11-ビルドテスト配布開発者向け) を参照してください。
 
-不具合報告や要望は [Issues](https://github.com/alineapps/kanna-vba/issues) へお願いします。整形が崩れる場合は、該当するコードの例を添えていただけると助かります。
+不具合報告や要望は [Issues](https://github.com/alineapps/SnapIndenter/issues) へお願いします。整形が崩れる場合は、該当するコードの例を添えていただけると助かります。
 
 ## ライセンス
 

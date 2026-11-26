@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Kanna.Core
+namespace SnapIndenter.Core
 {
     /// <summary>
     /// VBA コードのインデント整形エンジン。

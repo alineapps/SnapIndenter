@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using Kanna.Core;
+using SnapIndenter.Core;
 
-namespace Kanna.AddIn
+namespace SnapIndenter.AddIn
 {
-    /// <summary>%APPDATA%\Kanna\settings.ini に保存される設定。</summary>
+    /// <summary>%APPDATA%\SnapIndenter\settings.ini に保存される設定。</summary>
     internal sealed class Settings
     {
         public FormatterOptions Options { get; set; } = new FormatterOptions();
@@ -15,18 +15,21 @@ namespace Kanna.AddIn
         public string FormatModuleHotkey { get; set; } = "";
 
         public static string FilePath { get; } = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kanna", "settings.ini");
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SnapIndenter", "settings.ini");
 
-        /// <summary>旧名称（VBA Formatter 1.0）の設定ファイル。新しい設定がなければこちらを引き継ぐ。</summary>
-        private static string LegacyFilePath { get; } = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VbaFormatter", "settings.ini");
+        /// <summary>旧名称（Kanna for VBA 1.1、VBA Formatter 1.0）の設定ファイル。新しい設定がなければ、新しい順に探して引き継ぐ。</summary>
+        private static readonly string[] LegacyFilePaths =
+        {
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Kanna", "settings.ini"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VbaFormatter", "settings.ini"),
+        };
 
         public static Settings Load()
         {
             var s = new Settings();
             try
             {
-                string path = File.Exists(FilePath) ? FilePath : File.Exists(LegacyFilePath) ? LegacyFilePath : null;
+                string path = File.Exists(FilePath) ? FilePath : Array.Find(LegacyFilePaths, File.Exists);
                 if (path == null) return s;
                 var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var raw in File.ReadAllLines(path, Encoding.UTF8))

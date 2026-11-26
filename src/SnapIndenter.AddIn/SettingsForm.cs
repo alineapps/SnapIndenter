@@ -1,9 +1,9 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using Kanna.Core;
+using SnapIndenter.Core;
 
-namespace Kanna.AddIn
+namespace SnapIndenter.AddIn
 {
     /// <summary>設定ダイアログ（プレビュー付き）。</summary>
     internal sealed class SettingsForm : Form
@@ -62,7 +62,7 @@ End Sub";
 
         public SettingsForm(Settings current)
         {
-            Text = "Kanna for VBA の設定";
+            Text = "SnapIndenter の設定";
             FormBorderStyle = FormBorderStyle.Sizable;
             MinimizeBox = false;
             MaximizeBox = false;

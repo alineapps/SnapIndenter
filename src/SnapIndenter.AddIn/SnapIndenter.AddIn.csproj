@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <AssemblyName>Kanna</AssemblyName>
-    <RootNamespace>Kanna.AddIn</RootNamespace>
+    <AssemblyName>SnapIndenter</AssemblyName>
+    <RootNamespace>SnapIndenter.AddIn</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
-    <Product>Kanna for VBA</Product>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <Product>SnapIndenter</Product>
     <Description>VBE (Visual Basic Editor) 用の軽量コード整形アドイン</Description>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <!-- 整形エンジンは同じ DLL に含める（Office プロセスからの依存 DLL 解決を避けるため） -->
-    <Compile Include="..\Kanna.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
+    <Compile Include="..\SnapIndenter.Core\*.cs" Link="Core\%(Filename)%(Extension)" />
   </ItemGroup>
 
   <ItemGroup>
