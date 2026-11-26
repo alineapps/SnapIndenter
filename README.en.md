@@ -11,7 +11,7 @@
 |---|---|
 | ![Before](docs/images/before.png) | ![After](docs/images/after.png) |
 
-> **Note:** The user interface (menus, dialogs and messages) is currently **Japanese only**. The formatter itself works with any VBA code. English UI is planned.
+> The user interface is available in **English and Japanese**. It follows your Office display language by default; you can change it in the settings dialog.
 
 ## Features
 
@@ -28,7 +28,7 @@
 2. Close all Office applications.
 3. Right-click the zip → **Properties** → check **Unblock** at the bottom of the General tab → **OK**.
 4. Extract the zip and double-click `install.bat`.
-5. Start Excel or Access and press `Alt+F11`. A new **整形(J)** ("Format") menu appears in the VBE menu bar.
+5. Start Excel or Access and press `Alt+F11`. A new **SnapIndenter** menu appears in the VBE menu bar.
 
 > If you skip step 3, Windows may show a "Windows protected your PC" warning. Click **More info** → **Run anyway** to continue.
 
@@ -38,17 +38,17 @@ To uninstall, run `uninstall.bat`.
 
 ## Usage
 
-| Action | Menu item (Japanese) | Default shortcut |
+| Action | Menu item | Default shortcut |
 |---|---|---|
-| Format the procedure at the cursor (or the selected lines) | 整形 → プロシージャ/選択範囲を整形 | `Ctrl+Shift+F` |
-| Format the current module | 整形 → モジュールを整形 | (assignable) |
-| Format every module in the active project | 整形 → プロジェクト全体を整形 | |
-| Undo the last formatting | 整形 → 直前の整形を元に戻す | |
-| Settings (with live preview) | 整形 → 設定 | |
+| Indent the procedure at the cursor (or the selected lines) | SnapIndenter → Indent Procedure / Selection | `Ctrl+Shift+F` |
+| Indent the current module | SnapIndenter → Indent Module | (assignable) |
+| Indent every module in the active project | SnapIndenter → Indent All Modules in Project | |
+| Undo the last indent | SnapIndenter → Undo Last Indent | |
+| Settings (with live preview, language) | SnapIndenter → Settings... | |
 
 The same commands are also in the code window's right-click menu.
 
-Note: the VBE's own `Ctrl+Z` can't undo changes made by add-ins. Use "Undo the last formatting" instead.
+Note: the VBE's own `Ctrl+Z` can't undo changes made by add-ins. Use "Undo Last Indent" instead.
 
 ## What it formats
 
@@ -58,7 +58,7 @@ Note: the VBE's own `Ctrl+Z` can't undo changes made by add-ins. Use "Undo the l
 - Continuation lines (` _`) keep their position relative to the first line.
 - Keywords inside strings and comments are ignored.
 
-You can change the indent width, use tabs, choose whether `Case` is indented, set shortcuts and more in the settings dialog.
+You can change the indent width, use tabs, choose whether `Case` is indented, set shortcuts, switch the UI language and more in the settings dialog.
 The full specification is in [docs/仕様書.md](docs/仕様書.md) (Japanese).
 
 ## Building from source

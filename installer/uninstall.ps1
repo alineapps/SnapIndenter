@@ -5,7 +5,17 @@ $clsid   = '{0E25551F-0D2E-42D6-A7AD-1F172CD3E5A7}'
 $progId  = 'SnapIndenter.Connect'
 $destDir = Join-Path $env:LOCALAPPDATA 'SnapIndenter'
 
-Write-Host 'SnapIndenter をアンインストールします...'
+# 表示言語: Office の表示言語を優先し、取れなければ Windows の表示言語に従う
+$uiLang = $null
+foreach ($v in '16.0', '15.0', '14.0') {
+    $lr = Get-ItemProperty "HKCU:\Software\Microsoft\Office\$v\Common\LanguageResources" -ErrorAction SilentlyContinue
+    if ($lr -and $lr.UILanguageTag) { $uiLang = $lr.UILanguageTag; break }
+}
+if (-not $uiLang) { $uiLang = [Globalization.CultureInfo]::CurrentUICulture.Name }
+$ja = $uiLang -like 'ja*'
+function Get-Msg([string]$ja_, [string]$en) { if ($ja) { $ja_ } else { $en } }
+
+Write-Host (Get-Msg 'SnapIndenter をアンインストールします...' 'Uninstalling SnapIndenter...')
 
 $keys = @(
     "HKCU:\Software\Microsoft\VBA\VBE\6.0\Addins\$progId",
@@ -22,9 +32,9 @@ if (Test-Path $destDir) {
     try {
         Remove-Item $destDir -Recurse -Force
     } catch {
-        Write-Warning "フォルダーを削除できませんでした（Office が起動中の可能性があります）: $destDir"
+        Write-Warning ((Get-Msg 'フォルダーを削除できませんでした（Office が起動中の可能性があります）: ' 'Could not delete the folder (Office may still be running): ') + $destDir)
     }
 }
 
-Write-Host 'アンインストールが完了しました。' -ForegroundColor Green
-Write-Host "設定ファイルは残しています: $env:APPDATA\SnapIndenter\settings.ini"
+Write-Host (Get-Msg 'アンインストールが完了しました。' 'Uninstall complete.') -ForegroundColor Green
+Write-Host ((Get-Msg '設定ファイルは残しています: ' 'Your settings file was kept: ') + "$env:APPDATA\SnapIndenter\settings.ini")

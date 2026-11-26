@@ -11,15 +11,26 @@ $destDir  = Join-Path $env:LOCALAPPDATA 'SnapIndenter'
 $dll      = Join-Path $destDir 'SnapIndenter.dll'
 $srcDll   = Join-Path $Source 'SnapIndenter.dll'
 
-Write-Host 'SnapIndenter をインストールします...'
+# 表示言語: Office の表示言語を優先し、取れなければ Windows の表示言語に従う
+$uiLang = $null
+foreach ($v in '16.0', '15.0', '14.0') {
+    $lr = Get-ItemProperty "HKCU:\Software\Microsoft\Office\$v\Common\LanguageResources" -ErrorAction SilentlyContinue
+    if ($lr -and $lr.UILanguageTag) { $uiLang = $lr.UILanguageTag; break }
+}
+if (-not $uiLang) { $uiLang = [Globalization.CultureInfo]::CurrentUICulture.Name }
+$ja = $uiLang -like 'ja*'
+function Get-Msg([string]$ja_, [string]$en) { if ($ja) { $ja_ } else { $en } }
+
+Write-Host (Get-Msg 'SnapIndenter をインストールします...' 'Installing SnapIndenter...')
 
 if (-not (Test-Path $srcDll)) {
-    throw "SnapIndenter.dll が見つかりません: $srcDll"
+    throw ((Get-Msg 'SnapIndenter.dll が見つかりません: ' 'SnapIndenter.dll not found: ') + $srcDll)
 }
 
 $running = Get-Process EXCEL, MSACCESS, WINWORD, POWERPNT, OUTLOOK -ErrorAction SilentlyContinue
 if ($running) {
-    Write-Warning ('Office が起動中です（' + (($running | Select-Object -ExpandProperty ProcessName -Unique) -join ', ') + '）。インストール後に再起動してください。')
+    $names = ($running | Select-Object -ExpandProperty ProcessName -Unique) -join ', '
+    Write-Warning (Get-Msg "Office が起動中です（$names）。インストール後に再起動してください。" "Office is running ($names). Restart it after installation.")
 }
 
 # 0. 旧名称（VBA Formatter 1.0 / Kanna for VBA 1.1）が入っていれば削除する。設定ファイルは SnapIndenter が引き継ぐので残す
@@ -42,9 +53,9 @@ foreach ($l in $legacies) {
     $legacyDir = Join-Path $env:LOCALAPPDATA $l.Dir
     if (Test-Path $legacyDir) {
         $found = $true
-        try { Remove-Item $legacyDir -Recurse -Force } catch { Write-Warning "旧版のフォルダーを削除できませんでした: $legacyDir" }
+        try { Remove-Item $legacyDir -Recurse -Force } catch { Write-Warning ((Get-Msg '旧版のフォルダーを削除できませんでした: ' 'Could not delete the old version''s folder: ') + $legacyDir) }
     }
-    if ($found) { Write-Host "旧名称（$($l.Name)）の登録を削除しました。" }
+    if ($found) { Write-Host (Get-Msg "旧名称（$($l.Name)）の登録を削除しました。" "Removed the old version ($($l.Name)).") }
 }
 
 # 1. DLL をコピー
@@ -52,7 +63,7 @@ New-Item -ItemType Directory -Force -Path $destDir | Out-Null
 try {
     Copy-Item $srcDll $dll -Force
 } catch {
-    throw "DLL をコピーできませんでした。Excel / Access などをすべて終了してから再実行してください。`n$($_.Exception.Message)"
+    throw ((Get-Msg 'DLL をコピーできませんでした。Excel / Access などをすべて終了してから再実行してください。' 'Could not copy the DLL. Close Excel, Access and other Office apps, then run this again.') + "`n$($_.Exception.Message)")
 }
 Unblock-File $dll
 
@@ -97,12 +108,12 @@ foreach ($kind in 'Addins', 'Addins64') {
     $key = "HKCU:\Software\Microsoft\VBA\VBE\6.0\$kind\$progId"
     Set-Key $key $null
     Set-ItemProperty -Path $key -Name 'FriendlyName'    -Value 'SnapIndenter'
-    Set-ItemProperty -Path $key -Name 'Description'     -Value 'VBA コードのインデント整形'
+    Set-ItemProperty -Path $key -Name 'Description'     -Value 'VBA code indenter'
     Set-ItemProperty -Path $key -Name 'LoadBehavior'    -Value 3 -Type DWord
     Set-ItemProperty -Path $key -Name 'CommandLineSafe' -Value 0 -Type DWord
 }
 
 Write-Host ''
-Write-Host "インストールが完了しました（$dll）。" -ForegroundColor Green
-Write-Host 'Excel / Access を起動し、Alt+F11 で VBE を開くとメニューに「整形」が追加されています。'
-Write-Host 'ショートカット: Ctrl+Shift+F（カーソル位置のプロシージャまたは選択範囲を整形）'
+Write-Host (Get-Msg "インストールが完了しました（$dll）。" "Installation complete ($dll).") -ForegroundColor Green
+Write-Host (Get-Msg 'Excel / Access を起動し、Alt+F11 で VBE を開くとメニューに「整形」が追加されています。' 'Start Excel or Access and press Alt+F11. A new "SnapIndenter" menu appears in the VBE.')
+Write-Host (Get-Msg 'ショートカット: Ctrl+Shift+F（カーソル位置のプロシージャまたは選択範囲を整形）' 'Shortcut: Ctrl+Shift+F (indents the procedure at the cursor, or the selected lines)')

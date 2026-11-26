@@ -13,6 +13,8 @@ namespace SnapIndenter.AddIn
         public FormatterOptions Options { get; set; } = new FormatterOptions();
         public string FormatCurrentHotkey { get; set; } = "Ctrl+Shift+F";
         public string FormatModuleHotkey { get; set; } = "";
+        /// <summary>表示言語。auto（Windows の表示言語に従う）/ ja / en。</summary>
+        public string Language { get; set; } = L10n.Auto;
 
         public static string FilePath { get; } = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SnapIndenter", "settings.ini");
@@ -53,6 +55,7 @@ namespace SnapIndenter.AddIn
                 o.ContinuationIndentLevels = Clamp(GetInt(map, "ContinuationIndentLevels", o.ContinuationIndentLevels), 0, 8);
                 if (map.TryGetValue("FormatCurrentHotkey", out var h1)) s.FormatCurrentHotkey = h1;
                 if (map.TryGetValue("FormatModuleHotkey", out var h2)) s.FormatModuleHotkey = h2;
+                if (map.TryGetValue("Language", out var lang)) s.Language = L10n.Normalize(lang);
             }
             catch (Exception ex)
             {
@@ -78,6 +81,8 @@ namespace SnapIndenter.AddIn
             sb.AppendLine("[Hotkeys]");
             sb.AppendLine($"FormatCurrentHotkey={FormatCurrentHotkey}");
             sb.AppendLine($"FormatModuleHotkey={FormatModuleHotkey}");
+            sb.AppendLine("[UI]");
+            sb.AppendLine($"Language={L10n.Normalize(Language)}");
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
             File.WriteAllText(FilePath, sb.ToString(), new UTF8Encoding(false));
         }

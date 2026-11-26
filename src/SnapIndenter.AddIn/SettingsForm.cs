@@ -8,7 +8,11 @@ namespace SnapIndenter.AddIn
     /// <summary>設定ダイアログ（プレビュー付き）。</summary>
     internal sealed class SettingsForm : Form
     {
-        private const string Sample =
+        private static string Sample => L10n.IsJapanese
+            ? SampleTemplate
+            : SampleTemplate.Replace("' コメント", "' Comment").Replace("長いメッセージ", "A long message").Replace("を連結", " continued");
+
+        private const string SampleTemplate =
 @"Option Explicit
 #If VBA7 Then
 Private Declare PtrSafe Sub Sleep Lib ""kernel32"" (ByVal ms As LongPtr)
@@ -37,23 +41,25 @@ MsgBox Err.Description
 End Sub";
 
         private readonly NumericUpDown _indentSize = new NumericUpDown { Minimum = 1, Maximum = 16, Width = 60 };
-        private readonly CheckBox _useTabs = Check("インデントにタブを使う");
-        private readonly CheckBox _procBody = Check("プロシージャの本体をインデントする");
-        private readonly CheckBox _indentCase = Check("Select Case 内の Case をインデントする");
-        private readonly CheckBox _typeEnum = Check("Type / Enum のメンバーをインデントする");
-        private readonly CheckBox _directives = Check("#If ～ #End If の中をインデントする（オフ: 指令は 1 桁目）");
-        private readonly CheckBox _comments = Check("コメント行もインデントする");
-        private readonly CheckBox _contAlign = Check("継続行（ _）の相対位置を保持する");
+        private readonly CheckBox _useTabs = Check(L10n.T("インデントにタブを使う", "Use tabs for indentation"));
+        private readonly CheckBox _procBody = Check(L10n.T("プロシージャの本体をインデントする", "Indent procedure bodies"));
+        private readonly CheckBox _indentCase = Check(L10n.T("Select Case 内の Case をインデントする", "Indent Case inside Select Case"));
+        private readonly CheckBox _typeEnum = Check(L10n.T("Type / Enum のメンバーをインデントする", "Indent Type / Enum members"));
+        private readonly CheckBox _directives = Check(L10n.T("#If ～ #End If の中をインデントする（オフ: 指令は 1 桁目）", "Indent inside #If ... #End If (off: directives at column 1)"));
+        private readonly CheckBox _comments = Check(L10n.T("コメント行もインデントする", "Indent comment lines"));
+        private readonly CheckBox _contAlign = Check(L10n.T("継続行（ _）の相対位置を保持する", "Keep relative position of continuation lines ( _)"));
         private readonly NumericUpDown _contLevels = new NumericUpDown { Minimum = 0, Maximum = 8, Width = 60 };
         private readonly TextBox _hkCurrent = new TextBox { Width = 160 };
         private readonly TextBox _hkModule = new TextBox { Width = 160 };
+        private readonly ComboBox _language = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = 220 };
+        private static readonly string[] LanguageCodes = { L10n.Auto, L10n.Japanese, L10n.English };
         private readonly TextBox _preview = new TextBox
         {
             Multiline = true,
             ReadOnly = true,
             ScrollBars = ScrollBars.Both,
             WordWrap = false,
-            Font = new Font("MS Gothic", 10f),
+            Font = new Font(L10n.IsJapanese ? "MS Gothic" : "Consolas", 10f),
             Dock = DockStyle.Fill,
             BackColor = SystemColors.Window,
         };
@@ -62,13 +68,13 @@ End Sub";
 
         public SettingsForm(Settings current)
         {
-            Text = "SnapIndenter の設定";
+            Text = L10n.T("SnapIndenter の設定", "SnapIndenter Settings");
             FormBorderStyle = FormBorderStyle.Sizable;
             MinimizeBox = false;
             MaximizeBox = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            Font = new Font("Yu Gothic UI", 9f);
+            Font = L10n.IsJapanese ? new Font("Yu Gothic UI", 9f) : SystemFonts.MessageBoxFont;
             ClientSize = new Size(900, 560);
             MinimumSize = new Size(760, 480);
 
@@ -84,6 +90,8 @@ End Sub";
             _contLevels.Value = o.ContinuationIndentLevels;
             _hkCurrent.Text = current.FormatCurrentHotkey;
             _hkModule.Text = current.FormatModuleHotkey;
+            _language.Items.AddRange(new object[] { L10n.T("自動（Office の表示言語）", "Auto (Office display language)"), "日本語", "English" });
+            _language.SelectedIndex = Math.Max(0, Array.IndexOf(LanguageCodes, L10n.Normalize(current.Language)));
 
             var left = new FlowLayoutPanel
             {
@@ -93,7 +101,7 @@ End Sub";
                 AutoScroll = true,
                 Padding = new Padding(8),
             };
-            left.Controls.Add(Row("インデント幅:", _indentSize));
+            left.Controls.Add(Row(L10n.T("インデント幅:", "Indent width:"), _indentSize));
             left.Controls.Add(_useTabs);
             left.Controls.Add(_procBody);
             left.Controls.Add(_indentCase);
@@ -101,13 +109,16 @@ End Sub";
             left.Controls.Add(_directives);
             left.Controls.Add(_comments);
             left.Controls.Add(_contAlign);
-            left.Controls.Add(Row("継続行の追加インデント（段）:", _contLevels));
-            left.Controls.Add(new Label { Text = "ショートカットキー（例: Ctrl+Shift+F、空欄で無効）", AutoSize = true, Margin = new Padding(3, 16, 3, 3) });
-            left.Controls.Add(Row("プロシージャ/選択範囲:", _hkCurrent));
-            left.Controls.Add(Row("モジュール:", _hkModule));
+            left.Controls.Add(Row(L10n.T("継続行の追加インデント（段）:", "Extra indent for continuation lines (levels):"), _contLevels));
+            left.Controls.Add(new Label { Text = L10n.T("ショートカットキー（例: Ctrl+Shift+F、空欄で無効）", "Shortcut keys (e.g. Ctrl+Shift+F; leave blank to disable)"), AutoSize = true, Margin = new Padding(3, 16, 3, 3) });
+            left.Controls.Add(Row(L10n.T("プロシージャ/選択範囲:", "Procedure / selection:"), _hkCurrent));
+            left.Controls.Add(Row(L10n.T("モジュール:", "Module:"), _hkModule));
+            var languageRow = Row("言語 / Language:", _language);
+            languageRow.Margin = new Padding(0, 16, 0, 2);
+            left.Controls.Add(languageRow);
             left.Controls.Add(new Label
             {
-                Text = "設定ファイル: " + Settings.FilePath,
+                Text = L10n.T("設定ファイル: ", "Settings file: ") + Settings.FilePath,
                 AutoSize = true,
                 ForeColor = SystemColors.GrayText,
                 Margin = new Padding(3, 16, 3, 3),
@@ -115,8 +126,8 @@ End Sub";
             });
 
             var ok = new Button { Text = "OK", DialogResult = DialogResult.None, Width = 90 };
-            var cancel = new Button { Text = "キャンセル", DialogResult = DialogResult.Cancel, Width = 90 };
-            var reset = new Button { Text = "既定値に戻す", Width = 110 };
+            var cancel = new Button { Text = L10n.T("キャンセル", "Cancel"), DialogResult = DialogResult.Cancel, Width = 90 };
+            var reset = new Button { Text = L10n.T("既定値に戻す", "Reset to Defaults"), Width = 110 };
             ok.Click += (s, e) => OnOk();
             reset.Click += (s, e) => LoadOptions(new FormatterOptions());
             AcceptButton = ok;
@@ -127,7 +138,7 @@ End Sub";
             buttons.Controls.Add(ok);
             buttons.Controls.Add(reset);
 
-            var previewBox = new GroupBox { Text = "プレビュー", Dock = DockStyle.Fill, Padding = new Padding(6) };
+            var previewBox = new GroupBox { Text = L10n.T("プレビュー", "Preview"), Dock = DockStyle.Fill, Padding = new Padding(6) };
             previewBox.Controls.Add(_preview);
 
             var split = new SplitContainer { Dock = DockStyle.Fill, FixedPanel = FixedPanel.Panel1 };
@@ -184,7 +195,7 @@ End Sub";
                 string t = tb.Text.Trim();
                 if (t.Length > 0 && !Hotkey.TryParse(t, out _))
                 {
-                    MessageBox.Show(this, $"ショートカットキー「{t}」を解釈できません。\n例: Ctrl+Shift+F、Ctrl+Alt+I、F12",
+                    MessageBox.Show(this, L10n.T($"ショートカットキー「{t}」を解釈できません。\n例: Ctrl+Shift+F、Ctrl+Alt+I、F12", $"Can't recognize the shortcut \"{t}\".\nExamples: Ctrl+Shift+F, Ctrl+Alt+I, F12"),
                         Text, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     tb.Focus();
                     return;
@@ -195,6 +206,7 @@ End Sub";
                 Options = ReadOptions(),
                 FormatCurrentHotkey = _hkCurrent.Text.Trim(),
                 FormatModuleHotkey = _hkModule.Text.Trim(),
+                Language = LanguageCodes[Math.Max(0, _language.SelectedIndex)],
             };
             DialogResult = DialogResult.OK;
             Close();

@@ -21,6 +21,7 @@ namespace SnapIndenter.AddIn
         {
             _vbe = vbe;
             Settings = Settings.Load();
+            L10n.Apply(Settings.Language);
         }
 
         public event EventHandler SettingsChanged;
@@ -60,12 +61,12 @@ namespace SnapIndenter.AddIn
             VBProject project = _vbe.ActiveVBProject;
             if (project == null)
             {
-                Message("プロジェクトが選択されていません。", MessageBoxIcon.Information);
+                Message(L10n.T("プロジェクトが選択されていません。", "No project is selected."), MessageBoxIcon.Information);
                 return;
             }
             if (project.Protection == vbext_ProjectProtection.vbext_pp_locked)
             {
-                Message("プロジェクトがロックされているため整形できません。", MessageBoxIcon.Warning);
+                Message(L10n.T("プロジェクトがロックされているため整形できません。", "The project is locked and can't be indented."), MessageBoxIcon.Warning);
                 return;
             }
 
@@ -107,8 +108,8 @@ namespace SnapIndenter.AddIn
             }
             Remember(batch);
 
-            string msg = $"{modules} 個のモジュールを整形しました（変更 {changedLines} 行）。";
-            if (failed.Count > 0) msg += "\n\n整形できなかったモジュール:\n" + string.Join("\n", failed);
+            string msg = L10n.T($"{modules} 個のモジュールを整形しました（変更 {changedLines} 行）。", $"Indented {modules} module(s) ({changedLines} line(s) changed).");
+            if (failed.Count > 0) msg += L10n.T("\n\n整形できなかったモジュール:\n", "\n\nCouldn't indent these modules:\n") + string.Join("\n", failed);
             Message(msg, failed.Count > 0 ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
         });
 
@@ -117,7 +118,7 @@ namespace SnapIndenter.AddIn
             var batch = _lastBatch;
             if (batch == null || batch.Items.Count == 0)
             {
-                Message("元に戻せる整形はありません。", MessageBoxIcon.Information);
+                Message(L10n.T("元に戻せる整形はありません。", "There is nothing to undo."), MessageBoxIcon.Information);
                 return;
             }
             _lastBatch = null;
@@ -139,7 +140,7 @@ namespace SnapIndenter.AddIn
                 }
             }
             if (skipped > 0)
-                Message($"整形後に編集された行など {skipped} 行は元に戻せませんでした。", MessageBoxIcon.Warning);
+                Message(L10n.T($"整形後に編集された行など {skipped} 行は元に戻せませんでした。", $"{skipped} line(s) couldn't be restored (for example, lines edited after indenting)."), MessageBoxIcon.Warning);
         });
 
         public void ShowSettings() => Guard(() =>
@@ -148,6 +149,7 @@ namespace SnapIndenter.AddIn
             {
                 if (form.ShowDialog(Owner()) != DialogResult.OK) return;
                 Settings = form.Result;
+                L10n.Apply(Settings.Language);
                 Settings.Save();
                 SettingsChanged?.Invoke(this, EventArgs.Empty);
             }
@@ -163,7 +165,8 @@ namespace SnapIndenter.AddIn
             int top = pane.TopLine;
 
             var batch = new UndoBatch();
-            var r = FormatRange(cm, from, to, batch);            if (r.Changed > 0)
+            var r = FormatRange(cm, from, to, batch);
+            if (r.Changed > 0)
             {
                 Remember(batch);
                 RestoreSelection(pane, r, sl, sc, el, ec, top);
@@ -266,7 +269,7 @@ namespace SnapIndenter.AddIn
             if (pane == null)
             {
                 Log.Info("ActiveCodePane is null");
-                Message("コード ウィンドウを開いてから実行してください。", MessageBoxIcon.Information);
+                Message(L10n.T("コード ウィンドウを開いてから実行してください。", "Open a code window first."), MessageBoxIcon.Information);
                 return null;
             }
             try
@@ -274,7 +277,7 @@ namespace SnapIndenter.AddIn
                 var project = pane.CodeModule.Parent.Collection.Parent;
                 if (project.Protection == vbext_ProjectProtection.vbext_pp_locked)
                 {
-                    Message("プロジェクトがロックされているため整形できません。", MessageBoxIcon.Warning);
+                    Message(L10n.T("プロジェクトがロックされているため整形できません。", "The project is locked and can't be indented."), MessageBoxIcon.Warning);
                     return null;
                 }
             }
@@ -299,7 +302,7 @@ namespace SnapIndenter.AddIn
 
         private static string SafeName(VBComponent comp)
         {
-            try { return comp.Name; } catch { return "(不明)"; }
+            try { return comp.Name; } catch { return L10n.T("(不明)", "(unknown)"); }
         }
 
         private void Guard(Action action)
@@ -311,7 +314,7 @@ namespace SnapIndenter.AddIn
             catch (Exception ex)
             {
                 Log.Error(ex);
-                Message("整形中にエラーが発生しました。\n\n" + ex.Message, MessageBoxIcon.Error);
+                Message(L10n.T("整形中にエラーが発生しました。\n\n", "An error occurred while indenting.\n\n") + ex.Message, MessageBoxIcon.Error);
             }
         }
 
