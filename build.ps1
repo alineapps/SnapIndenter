@@ -16,7 +16,7 @@ New-Item -ItemType Directory -Force $stage | Out-Null
 
 Copy-Item $dllPath $stage
 Copy-Item installer\* $stage
-Copy-Item README.md, README.en.md, LICENSE $stage
+Copy-Item readme.txt, README.md, README.en.md, LICENSE $stage
 Copy-Item docs $stage -Recurse
 
 $zip = "dist\SnapIndenter-$version.zip"
