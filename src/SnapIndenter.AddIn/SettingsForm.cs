@@ -74,6 +74,10 @@ End Sub";
             MinimizeBox = false;
             MaximizeBox = false;
             ShowInTaskbar = false;
+            using (var stream = typeof(SettingsForm).Assembly.GetManifestResourceStream("SnapIndenter.ico"))
+            {
+                if (stream != null) Icon = new Icon(stream);
+            }
             StartPosition = FormStartPosition.CenterParent;
             Font = L10n.IsJapanese ? new Font("Yu Gothic UI", 9f) : SystemFonts.MessageBoxFont;
             ClientSize = new Size(900, 560);

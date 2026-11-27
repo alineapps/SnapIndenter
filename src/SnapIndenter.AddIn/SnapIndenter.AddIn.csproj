@@ -5,15 +5,22 @@
     <AssemblyName>SnapIndenter</AssemblyName>
     <RootNamespace>SnapIndenter.AddIn</RootNamespace>
     <LangVersion>latest</LangVersion>
-    <Version>1.5.0</Version>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <Version>1.5.1</Version>
+    <AssemblyVersion>1.5.1.0</AssemblyVersion>
+    <FileVersion>1.5.1.0</FileVersion>
     <Product>SnapIndenter</Product>
     <Description>VBE (Visual Basic Editor) 用の軽量コード整形アドイン</Description>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>embedded</DebugType>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- DLL の Win32 アイコン（Windows の「アプリ」一覧の DisplayIcon で使う） -->
+    <ApplicationIcon>..\..\assets\SnapIndenter.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 設定画面のアイコン -->
+    <EmbeddedResource Include="..\..\assets\SnapIndenter.form.ico" LogicalName="SnapIndenter.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- 整形エンジンは同じ DLL に含める（Office プロセスからの依存 DLL 解決を避けるため） -->

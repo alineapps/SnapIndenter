@@ -124,6 +124,7 @@ $sizeKb = [int][Math]::Ceiling(((Get-ChildItem $destDir -File | Measure-Object L
 Set-ItemProperty -Path $arp -Name 'DisplayName'     -Value 'SnapIndenter'
 Set-ItemProperty -Path $arp -Name 'DisplayVersion'  -Value $asm.Version.ToString(3)
 Set-ItemProperty -Path $arp -Name 'Publisher'       -Value 'ALINE APPS'
+Set-ItemProperty -Path $arp -Name 'DisplayIcon'     -Value "$dll,0"
 Set-ItemProperty -Path $arp -Name 'InstallLocation' -Value $destDir
 Set-ItemProperty -Path $arp -Name 'URLInfoAbout'    -Value 'https://github.com/alineapps/SnapIndenter'
 Set-ItemProperty -Path $arp -Name 'HelpLink'        -Value 'https://github.com/alineapps/SnapIndenter/issues'
