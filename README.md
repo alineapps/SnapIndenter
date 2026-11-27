@@ -5,7 +5,7 @@
 
 **一瞬で起動して、一瞬で整う。** Excel / Access の VBA コードを、VBE（Visual Basic Editor）からショートカットキー 1 つでインデント整形する軽量アドインです。
 
-[English README](README.en.md)
+[English README](README.en.md) ・ 紹介記事：[SmartIndenter が有償化したので、軽さ重視の VBA インデント整形アドイン「SnapIndenter」を作った（Qiita）](https://qiita.com/alineapps/items/0d2ff1a0496cf65a7ef9)
 
 | 整形前 | 整形後（`Ctrl+Shift+F`） |
 |---|---|
