@@ -113,7 +113,27 @@ foreach ($kind in 'Addins', 'Addins64') {
     Set-ItemProperty -Path $key -Name 'CommandLineSafe' -Value 0 -Type DWord
 }
 
+# 4. Windows の「アプリ」一覧（設定 → アプリ）からアンインストールできるように登録する
+#    アンインストーラーをインストール先にコピーし、そこを UninstallString に指定する
+$uninstallPs1 = Join-Path $destDir 'uninstall.ps1'
+Copy-Item (Join-Path $PSScriptRoot 'uninstall.ps1') $uninstallPs1 -Force
+Unblock-File $uninstallPs1
+$arp = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\SnapIndenter'
+Set-Key $arp $null
+$sizeKb = [int][Math]::Ceiling(((Get-ChildItem $destDir -File | Measure-Object Length -Sum).Sum) / 1KB)
+Set-ItemProperty -Path $arp -Name 'DisplayName'     -Value 'SnapIndenter'
+Set-ItemProperty -Path $arp -Name 'DisplayVersion'  -Value $asm.Version.ToString(3)
+Set-ItemProperty -Path $arp -Name 'Publisher'       -Value 'ALINE APPS'
+Set-ItemProperty -Path $arp -Name 'InstallLocation' -Value $destDir
+Set-ItemProperty -Path $arp -Name 'URLInfoAbout'    -Value 'https://github.com/alineapps/SnapIndenter'
+Set-ItemProperty -Path $arp -Name 'HelpLink'        -Value 'https://github.com/alineapps/SnapIndenter/issues'
+Set-ItemProperty -Path $arp -Name 'UninstallString' -Value "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$uninstallPs1`" -ShowDialog"
+Set-ItemProperty -Path $arp -Name 'EstimatedSize'   -Value $sizeKb -Type DWord
+Set-ItemProperty -Path $arp -Name 'NoModify'        -Value 1 -Type DWord
+Set-ItemProperty -Path $arp -Name 'NoRepair'        -Value 1 -Type DWord
+
 Write-Host ''
 Write-Host (Get-Msg "インストールが完了しました（$dll）。" "Installation complete ($dll).") -ForegroundColor Green
 Write-Host (Get-Msg 'Excel / Access を起動し、Alt+F11 で VBE を開くとメニューに「整形」が追加されています。' 'Start Excel or Access and press Alt+F11. A new "SnapIndenter" menu appears in the VBE.')
-Write-Host (Get-Msg 'ショートカット: Ctrl+Shift+F（カーソル位置のプロシージャまたは選択範囲を整形）' 'Shortcut: Ctrl+Shift+F (indents the procedure at the cursor, or the selected lines)')
+Write-Host (Get-Msg 'ショートカット: Ctrl+Shift+F（カーソル位置のプロシージャまたは選択範囲を整形）、Ctrl+Shift+M（モジュール全体を整形）' 'Shortcuts: Ctrl+Shift+F (indent the procedure at the cursor, or the selected lines), Ctrl+Shift+M (indent the whole module)')
+Write-Host (Get-Msg 'アンインストールは、Windows の「設定 → アプリ → インストールされているアプリ」から SnapIndenter を選ぶか、uninstall.bat を実行します。' 'To uninstall, choose SnapIndenter in Windows Settings > Apps > Installed apps, or run uninstall.bat.')

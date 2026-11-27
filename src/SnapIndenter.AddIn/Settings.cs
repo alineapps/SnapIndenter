@@ -12,7 +12,7 @@ namespace SnapIndenter.AddIn
     {
         public FormatterOptions Options { get; set; } = new FormatterOptions();
         public string FormatCurrentHotkey { get; set; } = "Ctrl+Shift+F";
-        public string FormatModuleHotkey { get; set; } = "";
+        public string FormatModuleHotkey { get; set; } = "Ctrl+Shift+M";
         /// <summary>表示言語。auto（Windows の表示言語に従う）/ ja / en。</summary>
         public string Language { get; set; } = L10n.Auto;
 

@@ -32,7 +32,7 @@
 
 > If you skip step 3, Windows may show a "Windows protected your PC" warning. Click **More info** → **Run anyway** to continue.
 
-To uninstall, run `uninstall.bat`.
+To uninstall, choose **SnapIndenter** in Windows **Settings → Apps → Installed apps**, or run `uninstall.bat`.
 
 **Requirements**: Windows 10 / 11, .NET Framework 4.8 (built into Windows), Office 2010 or later (including Microsoft 365)
 
@@ -41,7 +41,7 @@ To uninstall, run `uninstall.bat`.
 | Action | Menu item | Default shortcut |
 |---|---|---|
 | Indent the procedure at the cursor (or the selected lines) | SnapIndenter → Indent Procedure / Selection | `Ctrl+Shift+F` |
-| Indent the current module | SnapIndenter → Indent Module | (assignable) |
+| Indent the current module | SnapIndenter → Indent Module | `Ctrl+Shift+M` |
 | Indent every module in the active project | SnapIndenter → Indent All Modules in Project | |
 | Undo the last indent | SnapIndenter → Undo Last Indent | |
 | Settings (with live preview, language) | SnapIndenter → Settings... | |
